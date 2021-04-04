@@ -1,49 +1,45 @@
 MODULE := $(shell cat .package-name)
 LINE_LENGTH := 90
-NO_COLOR := \e[39m
-BLUE := \e[34m
-GREEN := \e[32m
-VENV_DIR := ./.venv/app
+VENV_DIR := .venv
 
 #----------------------------------------------------------
 
 .PHONY: check
-check : unit-tests black-format success venv pip-install
+check : test black venv pip
 
 .PHONY: venv
 venv :
-	@echo
-	@echo -e '$(BLUE)creating virtual environment...'
+	@echo -e '------------'
+	@echo -e 'creating virtual environment...'
+	@echo -e '------------'
 	@python3 -m venv ${VENV_DIR}
 
-.PHONY: pip-install
-pip-install :
-	@echo
-	@echo -e '$(BLUE)pip installing packages...'
-	@/bin/pip install --requirement dev-requirements.txt
+.PHONY: pip
+pip:
+	@echo -e '------------'
+	@echo -e 'pip installing packages...'
+	@echo -e '------------\n'
+	@$(VENV_DIR)/bin/pip install --requirement dev-requirements.txt
 
-.PHONY: unit-tests
-unit-tests :
+.PHONY: test
+test :
 	@echo
-	@echo -e '$(BLUE)unit-tests'
-	@echo -e        '----------$(NO_COLOR)'
-	@python3 -m pytest tests/
+	@echo -e '------------'
+	@echo -e 'running tests...'
+	@echo -e '------------\n'
+	@python -m pytest tests/
 
-.PHONY: type-check
-type-check :
-	@echo
-	@echo -e '$(BLUE)type-check'
-	@echo -e 		'----------$(NO_COLOR)'
-	@mypy ./*/*.py
-
-.PHONY: black-format
-black-format :
-	@echo
-	@echo -e '$(BLUE)black-format'
-	@echo -e 		'------------$(NO_COLOR)'
+.PHONY: black
+black :
+	@echo -e '------------'
+	@echo -e 'running black...'
+	@echo -e '------------\n'
 	@black $(MODULE) -l $(LINE_LENGTH)
 
-.PHONY: success
-success :
-	@echo
-	@echo -e '$(GREEN)ALL CHECKS COMPLETED SUCCESSFULLY$(NO_COLOR)'
+.PHONY: update-package
+# run as: make update-package package=new_package_name
+update-package :
+	@echo -e '------------'
+	@echo -e 'updating package...'
+	@echo -e '------------\n'
+	@echo -n $(package) > .package-name && mv python_template/ $(package)/
