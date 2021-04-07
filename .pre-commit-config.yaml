@@ -1,0 +1,7 @@
+repos:
+-   repo: local
+    hooks:
+    -   id: black
+        name: run black formatter
+        language: system
+        entry: make black

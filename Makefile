@@ -1,45 +1,46 @@
 MODULE := $(shell cat .package-name)
-LINE_LENGTH := 90
+LINE_LENGTH := 80
 VENV_DIR := .venv
-
-#----------------------------------------------------------
-
-.PHONY: check
-check : test black venv pip
 
 .PHONY: venv
 venv :
-	@echo -e '------------'
-	@echo -e 'creating virtual environment...'
-	@echo -e '------------'
-	@python3 -m venv ${VENV_DIR}
+	python -m venv ${VENV_DIR}
 
 .PHONY: pip
 pip:
-	@echo -e '------------'
-	@echo -e 'pip installing packages...'
-	@echo -e '------------\n'
-	@$(VENV_DIR)/bin/pip install --requirement dev-requirements.txt
+	$(VENV_DIR)/bin/pip install --requirement dev-requirements.txt
+
+.PHONY: typehint
+typehint:
+	$(VENV_DIR)/bin/mypy --ignore-missing-imports ${MODULE}
 
 .PHONY: test
 test :
-	@echo
-	@echo -e '------------'
-	@echo -e 'running tests...'
-	@echo -e '------------\n'
-	@python -m pytest tests/
+	$(VENV_DIR)/bin/pytest tests/
 
 .PHONY: black
 black :
-	@echo -e '------------'
-	@echo -e 'running black...'
-	@echo -e '------------\n'
-	@black $(MODULE) -l $(LINE_LENGTH)
+	$(VENV_DIR)/bin/black $(MODULE) -l $(LINE_LENGTH)
 
-.PHONY: update-package
-# run as: make update-package package=new_package_name
-update-package :
-	@echo -e '------------'
-	@echo -e 'updating package...'
-	@echo -e '------------\n'
-	@echo -n $(package) > .package-name && mv python_template/ $(package)/
+.PHONY: pc-install
+pc-install:
+	${VENV_DIR}/bin/pre-commit install
+
+
+.PHONY: package
+# purpose: update the parent project package name
+# run as: make package name=new_package_name
+package:
+	@echo -n $(name) > .package-name && mv python_template/ $(name)/
+
+.PHONY: clean
+clean:
+	find . -type f -name "*pyc" | xargs rm -rf
+	find . -type d -name __pycache__ | xargs rm -rf
+	find . -type d -name ${VENV_DIR} | xargs rm -rf
+
+.PHONY: install
+install: venv pip pc-install
+
+.PHONY: checklist
+checklist: black test
