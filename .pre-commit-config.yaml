@@ -8,4 +8,4 @@ repos:
     -   id: reorder-python-imports
         name: reorder python imports
         language: system
-        entry: make black
+        entry: make reorder-imports
