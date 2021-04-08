@@ -24,8 +24,7 @@ black :
 
 .PHONY: pc-install
 pc-install:
-	${VENV_DIR}/bin/pre-commit install
-
+	$(VENV_DIR)/bin/pre-commit install
 
 .PHONY: package
 # purpose: update the parent project package name
@@ -33,14 +32,19 @@ pc-install:
 package:
 	@echo -n $(name) > .package-name && mv python_template/ $(name)/
 
+.PHONY: reorder-imports
+reorder-imports:
+	$(VENV_DIR)/bin/reorder-python-imports
+
+
 .PHONY: clean
 clean:
 	find . -type f -name "*pyc" | xargs rm -rf
 	find . -type d -name __pycache__ | xargs rm -rf
-	find . -type d -name ${VENV_DIR} | xargs rm -rf
+	find . -type d -name $(VENV_DIR) | xargs rm -rf
 
 .PHONY: install
 install: venv pip pc-install
 
 .PHONY: checklist
-checklist: black test
+checklist: black reorder-imports test

@@ -5,3 +5,7 @@ repos:
         name: run black formatter
         language: system
         entry: make black
+    -   id: reorder-python-imports
+        name: reorder python imports
+        language: system
+        entry: make black
