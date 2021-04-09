@@ -9,3 +9,8 @@ repos:
         name: reorder python imports
         language: system
         entry: make reorder-imports
+    -   id: autoflake
+        name: autoflake - remove unused imports and unused variables
+        language: system
+        entry: make autoflake
+        
