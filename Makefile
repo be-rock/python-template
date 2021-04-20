@@ -1,4 +1,4 @@
-MODULE := ${shell cat .package-name}
+PACKAGE := ${shell cat .package-name}
 LINE_LENGTH := 80
 VENV_DIR := .venv
 
@@ -16,19 +16,27 @@ pip-prd:
 
 .PHONY: typehint
 typehint:
-	${VENV_DIR}/bin/mypy --ignore-missing-imports ${MODULE}
+	${VENV_DIR}/bin/mypy --ignore-missing-imports ${PACKAGE}
 
 .PHONY: autoflake
 autoflake:
-	${VENV_DIR}/bin/autoflake --in-place --remove-unused-variables  --remove-all-unused-imports --recursive ${MODULE}/ tests/
+	${VENV_DIR}/bin/autoflake --in-place --remove-unused-variables  --remove-all-unused-imports --recursive ${PACKAGE}/ tests/
+
+.PHONY: pylint
+pylint:
+	${VENV_DIR}/bin/pylint ${PACKAGE}/
+
+.PHONY: radon
+radon:
+	${VENV_DIR}/bin/radon cc -a -nc ${PACKAGE}/
 
 .PHONY: test
-test :
-	${VENV_DIR}/bin/pytest tests/
+test:
+	${VENV_DIR}/bin/pytest --verbose tests/
 
 .PHONY: black
 black :
-	${VENV_DIR}/bin/black ${MODULE} -l ${LINE_LENGTH}
+	${VENV_DIR}/bin/black ${PACKAGE} -l ${LINE_LENGTH}
 
 .PHONY: pc-install
 pc-install:
@@ -38,11 +46,11 @@ pc-install:
 # purpose: update the parent project package name
 # run as: make package name=new_package_name
 package:
-	@echo -n ${name} > .package-name && mv python_template/ ${name}/
+	@echo -n ${name} > .package-name && mv ${PACKAGE}/ ${name}/
 
-.PHONY: reorder-imports
-reorder-imports:
-	${VENV_DIR}/bin/reorder-python-imports
+.PHONY: isort
+isort:
+	${VENV_DIR}/bin/isort ${PACKAGE}/ tests/
 
 
 .PHONY: clean
@@ -55,7 +63,7 @@ clean:
 install: venv pip-dev pc-install
 
 .PHONY: cicd
-cicd: venv pip-prd typehint test
+cicd: venv pip-dev typehint pylint test
 
 .PHONY: checklist
-checklist: black autoflake reorder-imports typehint test
+checklist: black autoflake isort pylint radon typehint test

@@ -1,5 +1,7 @@
 -r requirements.txt # include prod requirements in dev
 autoflake
 black
+isort
 pre-commit
-reorder-python-imports
+pylint
+radon

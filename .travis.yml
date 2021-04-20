@@ -1,0 +1,16 @@
+language: python
+python:
+  - "3.9"
+
+env:
+  - PACKAGE_NAME=$(cat .package-name)
+
+# install dependencies
+install:
+  - pip install -r requirements.txt
+
+# run tests
+script: pytest --cov=${PACKAGE_NAME}
+
+# after_success:
+  # - codecov

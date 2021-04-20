@@ -6,11 +6,10 @@ repos:
         language: system
         entry: make black
     -   id: reorder-python-imports
-        name: reorder python imports
+        name: isort
         language: system
-        entry: make reorder-imports
+        entry: make isort
     -   id: autoflake
         name: autoflake - remove unused imports and unused variables
         language: system
         entry: make autoflake
-        
