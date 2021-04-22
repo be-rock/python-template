@@ -16,7 +16,7 @@ pip-prd:
 
 .PHONY: typehint
 typehint:
-	${VENV_DIR}/bin/mypy --ignore-missing-imports ${PACKAGE}
+	${VENV_DIR}/bin/mypy --ignore-missing-imports ${PACKAGE}/ tests/
 
 .PHONY: autoflake
 autoflake:
@@ -36,7 +36,7 @@ test:
 
 .PHONY: black
 black :
-	${VENV_DIR}/bin/black ${PACKAGE} -l ${LINE_LENGTH}
+	${VENV_DIR}/bin/black ${PACKAGE}/ tests/ -l ${LINE_LENGTH}
 
 .PHONY: pc-install
 pc-install:

@@ -3,6 +3,8 @@
 pipeline {
     agent any
     // agent { label 'linux' }
+    // agent { dockerfile true }
+    // agent { docker { image 'linux' } }
 
     environment {
         VIRTUAL_ENV = "${env.WORKSPACE}/.venv"
@@ -33,10 +35,8 @@ pipeline {
         always {
             deleteDir() // clean up the workspace directory
         }
-        // failure {
-        // }
+        // failure {  }
 
-        // success {
-        // }
+        // success {  }
     }
 }
