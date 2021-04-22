@@ -24,11 +24,11 @@ autoflake:
 
 .PHONY: pylint
 pylint:
-	${VENV_DIR}/bin/pylint ${PACKAGE}/
+	${VENV_DIR}/bin/pylint ${PACKAGE}/ tests/
 
 .PHONY: radon
 radon:
-	${VENV_DIR}/bin/radon cc -a -nc ${PACKAGE}/
+	${VENV_DIR}/bin/radon cc -a -nc ${PACKAGE}/ tests/
 
 .PHONY: test
 test:
@@ -63,7 +63,7 @@ clean:
 install: venv pip-dev pc-install
 
 .PHONY: cicd
-cicd: venv pip-dev typehint pylint test
+cicd: venv pip-dev typehint pylint radon
 
 .PHONY: checklist
 checklist: black autoflake isort pylint radon typehint test

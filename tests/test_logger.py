@@ -1,3 +1,6 @@
+"""
+logger tests
+"""
 import logging
 import os
 from logging.handlers import TimedRotatingFileHandler
@@ -10,6 +13,7 @@ LOG_FORMATTER = "'%(asctime)s - %(name)s - %(levelname)s - %(message)s'"
 def get_stream_log_handler(
     formatter: logging.Formatter = jsonlogger.JsonFormatter(LOG_FORMATTER),
 ):
+    """create a basic stream log handler"""
     handler = logging.StreamHandler()
     handler.setFormatter(formatter)
     return handler
@@ -22,6 +26,7 @@ def get_timed_rotating_log_handler(
     backup_count: int = 0,
     formatter: logging.Formatter = jsonlogger.JsonFormatter(LOG_FORMATTER),
 ):
+    """create a timed, rotating log handler"""
     handler = TimedRotatingFileHandler(
         os.path.join(log_dir, log_file),
         when=log_rotate_time,
@@ -36,6 +41,7 @@ def get_logger(
     logger_name: str,
     level: int = logging.INFO,
 ):
+    """create a logger"""
     logger = logging.getLogger(logger_name)
     logger.setLevel(level=level)
     logger.addHandler(hdlr=handler)
@@ -44,6 +50,7 @@ def get_logger(
 
 
 def test_logger():
+    """do some tests"""
     file_logger = get_logger(
         handler=get_timed_rotating_log_handler(), logger_name=__name__
     )

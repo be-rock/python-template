@@ -13,3 +13,7 @@ repos:
         name: autoflake - remove unused imports and unused variables
         language: system
         entry: make autoflake
+    -   id: radon
+        name: radon - cyclomatic complexity
+        language: system
+        entry: make radon
