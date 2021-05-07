@@ -1,69 +1,62 @@
+.DEFAULT_GOAL := help
 PACKAGE := ${shell cat .package-name}
 LINE_LENGTH := 80
 VENV_DIR := .venv
 
-.PHONY: venv
-venv :
+.PHONY: venv pip-dev pip-prd typehint autoflake pylint radon test black pc-install package isort clean install cicd checklist
+
+help: ## Show this help message.
+	@echo -e 'Usage: make [target] ...\n'
+	@echo 'targets:'
+	@egrep '^(.+)\:\ ##\ (.+)' ${MAKEFILE_LIST} | column -t -c 2 -s ':#'
+
+venv: ## Create a python virtual environment
 	python -m venv ${VENV_DIR}
 
-.PHONY: pip-dev
-pip-dev:
+pip-dev: ## Install pip dev requirements
 	${VENV_DIR}/bin/pip install --requirement dev-requirements.txt
 
-.PHONY: pip-prd
-pip-prd:
+pip-prd: ## Install pip prod requirements
 	${VENV_DIR}/bin/pip install --requirement requirements.txt
 
-.PHONY: typehint
-typehint:
+typehint: ## Mypy typehints
 	${VENV_DIR}/bin/mypy --ignore-missing-imports ${PACKAGE}/ tests/
 
-.PHONY: autoflake
-autoflake:
+autoflake: ## autoflake
 	${VENV_DIR}/bin/autoflake --in-place --remove-unused-variables  --remove-all-unused-imports --recursive ${PACKAGE}/ tests/
 
-.PHONY: pylint
-pylint:
+pylint: ## pylint
 	${VENV_DIR}/bin/pylint ${PACKAGE}/ tests/
 
-.PHONY: radon
-radon:
+radon: ## radon
 	${VENV_DIR}/bin/radon cc -a -nc ${PACKAGE}/ tests/
 
-.PHONY: test
-test:
+test: ## Run tests
 	${VENV_DIR}/bin/pytest --verbose tests/
 
-.PHONY: black
-black :
+black: ## Run the black formatter
 	${VENV_DIR}/bin/black ${PACKAGE}/ tests/ -l ${LINE_LENGTH}
 
-.PHONY: pc-install
-pc-install:
+pc-install: ## Setup pre-commit
 	${VENV_DIR}/bin/pre-commit install
 
-.PHONY: package
-# purpose: update the parent project package name
-# run as: make package name=new_package_name
-package:
+package: ## Update the project package name such as `make package name=new_package_name`
 	@echo -n ${name} > .package-name && mv ${PACKAGE}/ ${name}/
 
-.PHONY: isort
-isort:
+isort: ## run isort
 	${VENV_DIR}/bin/isort ${PACKAGE}/ tests/
 
 
-.PHONY: clean
-clean:
+clean: ## clean up venv and cache
 	find . -type f -name "*pyc" | xargs rm -rf
 	find . -type d -name __pycache__ | xargs rm -rf
 	find . -type d -name ${VENV_DIR} | xargs rm -rf
 
-.PHONY: install
-install: venv pip-dev pc-install
+install: ## setup dev environment
+	venv pip-dev pc-install
 
-.PHONY: cicd
-cicd: venv pip-dev typehint pylint radon
+cicd: ## run cicd suite
+	venv pip-dev typehint pylint radon
 
-.PHONY: checklist
-checklist: black autoflake isort pylint radon typehint test
+checklist: ## run dev checklist
+	black autoflake isort pylint radon typehint test
