@@ -40,7 +40,7 @@ def get_logger(
     handler: logging.Handler,
     logger_name: str,
     level: int = logging.INFO,
-):
+) -> logging.Logger:
     """create a logger"""
     logger = logging.getLogger(logger_name)
     logger.setLevel(level=level)
