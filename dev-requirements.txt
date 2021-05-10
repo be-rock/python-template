@@ -2,6 +2,7 @@
 autoflake
 black
 isort
+mkdocs
 pre-commit
 pylint
 radon

@@ -3,30 +3,50 @@ PACKAGE := ${shell cat .package-name}
 LINE_LENGTH := 80
 VENV_DIR := .venv
 
-.PHONY: venv pip-dev pip-prd typehint autoflake pylint radon test black pc-install package isort clean install cicd checklist
+.PHONY: docs-new docs-serve docs-deploy venv pip-dev pip-prd typehint autoflake pylint radon test black pc-install package isort clean setup checklist
 
 help: ## Show this help message.
 	@echo -e 'Usage: make [target] ...\n'
 	@echo 'targets:'
 	@egrep '^(.+)\:\ ##\ (.+)' ${MAKEFILE_LIST} | column -t -c 2 -s ':#'
 
-venv: ## Create a python virtual environment
-	python -m venv ${VENV_DIR}
-
-pip-dev: ## Install pip dev requirements
-	${VENV_DIR}/bin/pip install --requirement dev-requirements.txt
-
-pip-prd: ## Install pip prod requirements
-	${VENV_DIR}/bin/pip install --requirement requirements.txt
-
-typehint: ## Mypy typehints
-	${VENV_DIR}/bin/mypy --ignore-missing-imports ${PACKAGE}/ tests/
-
 autoflake: ## autoflake
 	${VENV_DIR}/bin/autoflake --in-place --remove-unused-variables  --remove-all-unused-imports --recursive ${PACKAGE}/ tests/
 
+black: ## Run the black formatter
+	${VENV_DIR}/bin/black ${PACKAGE}/ tests/ -l ${LINE_LENGTH}
+
+clean: ## clean up venv and cache
+	find . -type f -name "*pyc" | xargs rm -rf
+	find . -type d -name __pycache__ | xargs rm -rf
+	find . -type d -name ${VENV_DIR} | xargs rm -rf
+
+docs-deploy: ## deploy docs to github
+	${VENV_DIR}/bin/mkdocs gh-deploy
+
+docs-new: ## create documentation library
+	${VENV_DIR}/bin/mkdocs new .
+
+docs-serve: ## spin up local web server to serve up docs on localhost
+	${VENV_DIR}/bin/mkdocs serve
+
+isort: ## run isort
+	${VENV_DIR}/bin/isort ${PACKAGE}/ tests/
+
+package: ## Update the project package name such as `make package name=new_package_name`
+	@echo -n ${name} > .package-name && mv ${PACKAGE}/ ${name}/
+
+pc-install: ## Setup pre-commit
+	${VENV_DIR}/bin/pre-commit install
+
+pip-dev: ## Install pip dev (for local development) requirements
+	${VENV_DIR}/bin/pip install --upgrade pip --requirement dev-requirements.txt
+
+pip-prd: ## Install pip prod requirements
+	${VENV_DIR}/bin/pip install --upgrade pip --requirement requirements.txt
+
 pylint: ## pylint
-	${VENV_DIR}/bin/pylint ${PACKAGE}/ tests/
+	${VENV_DIR}/bin/pylint --exit-zero ${PACKAGE}/ tests/
 
 radon: ## radon
 	${VENV_DIR}/bin/radon cc -a -nc ${PACKAGE}/ tests/
@@ -34,29 +54,14 @@ radon: ## radon
 test: ## Run tests
 	${VENV_DIR}/bin/pytest --verbose tests/
 
-black: ## Run the black formatter
-	${VENV_DIR}/bin/black ${PACKAGE}/ tests/ -l ${LINE_LENGTH}
+typehint: ## Mypy typehints
+	${VENV_DIR}/bin/mypy --ignore-missing-imports ${PACKAGE}/ tests/
 
-pc-install: ## Setup pre-commit
-	${VENV_DIR}/bin/pre-commit install
-
-package: ## Update the project package name such as `make package name=new_package_name`
-	@echo -n ${name} > .package-name && mv ${PACKAGE}/ ${name}/
-
-isort: ## run isort
-	${VENV_DIR}/bin/isort ${PACKAGE}/ tests/
+venv: ## Create a python virtual environment
+	python -m venv ${VENV_DIR}
 
 
-clean: ## clean up venv and cache
-	find . -type f -name "*pyc" | xargs rm -rf
-	find . -type d -name __pycache__ | xargs rm -rf
-	find . -type d -name ${VENV_DIR} | xargs rm -rf
 
-install: ## setup dev environment
-	venv pip-dev pc-install
+install: venv pip-dev pc-install docs-new
 
-cicd: ## run cicd suite
-	venv pip-dev typehint pylint radon
-
-checklist: ## run dev checklist
-	black autoflake isort pylint radon typehint test
+checklist: black autoflake isort pylint
