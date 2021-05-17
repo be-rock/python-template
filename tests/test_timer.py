@@ -8,7 +8,7 @@ from time import perf_counter
 from tests.test_logger import get_logger, get_timed_rotating_log_handler
 
 handler = get_timed_rotating_log_handler()
-logger = get_logger(handler)
+logger = get_logger(handler, logger_name=__name__)
 
 
 def timer_logger(logger):
@@ -24,7 +24,7 @@ def timer_logger(logger):
             result = func(*args, **kwargs)
             logger.info(
                 f"end {func.__name__}",
-                extra={"elapsed": round((perf_counter() - start).real, 3)},
+                extra={"elapsed": round((perf_counter() - start).real, 6)},
             )
             return result
 

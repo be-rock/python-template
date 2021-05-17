@@ -54,8 +54,12 @@ def test_logger():
     file_logger = get_logger(
         handler=get_timed_rotating_log_handler(), logger_name=__name__
     )
-    file_logger.info("classic message", extra={"special": "value", "run": 12})
+    file_logger.info(
+        "classic message", extra={"file_logger": "value", "run": 12}
+    )
     stream_logger = get_logger(
         handler=get_stream_log_handler(), logger_name=__name__
     )
-    stream_logger.info("classic message", extra={"special": "value", "run": 12})
+    stream_logger.info(
+        "classic message", extra={"stream_logger": "value", "run": 12}
+    )
