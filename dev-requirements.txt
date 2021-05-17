@@ -1,7 +1,9 @@
 -r requirements.txt # include prod requirements in dev
 autoflake
 black
+ipython
 isort
+# locust # load testing
 mkdocs
 pre-commit
 pylint
