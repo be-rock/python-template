@@ -4,7 +4,7 @@ black
 ipython
 isort
 # locust # load testing
-mkdocs
+# mkdocs # static site generator
 pre-commit
 pylint
 radon

@@ -1,7 +1,8 @@
 .DEFAULT_GOAL := help
-PACKAGE := ${shell cat .package-name}
+PACKAGE := python_template
+OLD_PACKAGE := ${shell find . -maxdepth 2 -name __init__.py | grep -v tests | cut -d'/' -f2}
 LINE_LENGTH := 80
-VENV_DIR := .venv
+VENV_DIR := ~/.venv/${PACKAGE}
 
 .PHONY: docs-new docs-serve docs-deploy venv pip-dev pip-prd typehint autoflake pylint radon test black pc-install package isort clean setup checklist
 
@@ -33,8 +34,8 @@ docs-serve: ## spin up local web server to serve up docs on localhost
 isort: ## run isort
 	${VENV_DIR}/bin/isort ${PACKAGE}/ tests/
 
-package: ## Update the project package name such as `make package name=new_package_name`
-	@echo -n ${name} > .package-name && mv ${PACKAGE}/ ${name}/
+package: ## Update the project package name according to whats defined in the Makefile `PACKAGE` variable
+	mv ${OLD_PACKAGE} ${PACKAGE}
 
 pc-install: ## Setup pre-commit
 	${VENV_DIR}/bin/pre-commit install
@@ -62,6 +63,6 @@ venv: ## Create a python virtual environment
 
 
 
-install: venv pip-dev pc-install docs-new
+setup: venv pip-dev pc-install
 
 checklist: black autoflake isort pylint
