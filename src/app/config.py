@@ -1,5 +1,6 @@
 import datetime
 import os
+from pathlib import Path
 from typing import Union
 
 import tomli as toml
@@ -39,7 +40,10 @@ class Config(BaseSettings):
         allow_mutation = False
 
 def read_app_config_file(config_file: str = "app-conf.toml") -> dict:
-    with open(config_file, "rb") as conf:
+    path = Path(config_file)
+    if not path.is_absolute():
+        path = (Path(__file__).parent.absolute() / config_file)
+    with open(path.as_posix(), "rb") as conf:
         return toml.load(conf)
 
 
@@ -50,6 +54,6 @@ def set_app_env_vars(env_file: str = ".env") -> None:
             k, v = item.split('=')
             os.environ[k] = v
 
-_conf = read_app_config_file(config_file='/tmp/app-conf.toml')
+_conf = read_app_config_file()
 CONFIG = Config(**_conf)
 set_app_env_vars(env_file='/tmp/.env')
