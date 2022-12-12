@@ -7,4 +7,5 @@ isort
 # mkdocs # static site generator
 pre-commit
 pylint
+python-json-logger
 radon

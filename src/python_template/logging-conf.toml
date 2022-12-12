@@ -1,0 +1,40 @@
+disable_existing_loggers = true
+version = 1
+
+[formatters]
+[formatters.standard]
+format = "%(asctime)s | %(levelname)s | %(name)s | %(message)s"
+converter = 'time.gmtime'
+[formatters.json]
+format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+class = "pythonjsonlogger.jsonlogger.JsonFormatter"
+converters = 'time.gmtime'
+[formatters.utc]
+format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+class = "pythonjsonlogger.jsonlogger.JsonFormatter"
+converters = 'time.gmtime'
+
+[handlers]
+[handlers.default]
+class = "logging.StreamHandler"
+formatter = "standard"
+level = "INFO"
+stream = "ext://sys.stdout" # default is stderr
+[handlers.file_handler]
+class = "logging.handlers.TimedRotatingFileHandler"
+filename = "app.log"
+formatter = "standard"
+level = "INFO"
+when = "m" # minute
+interval = 1 # quantity of 'when'
+[handlers.json_handler]
+class = "logging.StreamHandler"
+formatter = "json"
+level = "INFO"
+stream = "ext://sys.stdout" # default is stderr
+
+[loggers.''] # root logger
+# handlers = ["default", "file_handler", "json_handler"]
+handlers = ["default", "file_handler"]
+level = "INFO"
+propogate = false

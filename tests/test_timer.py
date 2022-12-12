@@ -5,10 +5,9 @@ import json
 from functools import wraps
 from time import perf_counter
 
-from tests.test_logger import get_logger, get_timed_rotating_log_handler
+from src.python_template.config import get_logger
 
-handler = get_timed_rotating_log_handler()
-logger = get_logger(handler, logger_name=__name__)
+logger = get_logger(logger_name=__name__)
 
 
 def timer_logger(logger):
@@ -34,6 +33,8 @@ def timer_logger(logger):
 
 
 def test_timer_logger_decorator():
+    """test the decorator"""
+
     @timer_logger(logger=logger)
     def func():
         assert True

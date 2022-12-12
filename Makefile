@@ -12,10 +12,10 @@ help: ## Show this help message.
 	@egrep '^(.+)\:\ ##\ (.+)' ${MAKEFILE_LIST} | column -t -c 2 -s ':#'
 
 autoflake: ## autoflake
-	${VENV_DIR}/bin/autoflake --in-place --remove-unused-variables  --remove-all-unused-imports --recursive ${PACKAGE}/ tests/
+	${VENV_DIR}/bin/autoflake --in-place --remove-unused-variables  --remove-all-unused-imports --recursive src/${PACKAGE}/ tests/
 
 black: ## Run the black formatter
-	${VENV_DIR}/bin/black ${PACKAGE}/ tests/ -l ${LINE_LENGTH}
+	${VENV_DIR}/bin/black src/${PACKAGE}/ tests/ -l ${LINE_LENGTH}
 
 clean: ## clean up venv and cache
 	find . -type f -name "*pyc" | xargs rm -rf
@@ -32,10 +32,10 @@ docs-serve: ## spin up local web server to serve up docs on localhost
 	${VENV_DIR}/bin/mkdocs serve
 
 isort: ## run isort
-	${VENV_DIR}/bin/isort ${PACKAGE}/ tests/
+	${VENV_DIR}/bin/isort src/${PACKAGE}/ tests/
 
 package: ## Update the project package name according to whats defined in the Makefile `PACKAGE` variable
-	mv ${OLD_PACKAGE} ${PACKAGE}
+	mv src/${OLD_PACKAGE} src/${PACKAGE}
 
 pc-install: ## Setup pre-commit
 	${VENV_DIR}/bin/pre-commit install
@@ -47,21 +47,19 @@ pip-prd: ## Install pip prod requirements
 	${VENV_DIR}/bin/pip install --upgrade pip --requirement requirements.txt
 
 pylint: ## pylint
-	${VENV_DIR}/bin/pylint --exit-zero ${PACKAGE}/ tests/
+	${VENV_DIR}/bin/pylint --exit-zero src/${PACKAGE}/ tests/
 
 radon: ## radon
-	${VENV_DIR}/bin/radon cc -a -nc ${PACKAGE}/ tests/
+	${VENV_DIR}/bin/radon cc -a -nc src/${PACKAGE}/ tests/
 
 test: ## Run tests
-	${VENV_DIR}/bin/pytest --verbose tests/
+	${VENV_DIR}/bin/pytest -s --verbose tests/
 
 typehint: ## Mypy typehints
-	${VENV_DIR}/bin/mypy --ignore-missing-imports ${PACKAGE}/ tests/
+	${VENV_DIR}/bin/mypy --ignore-missing-imports src/${PACKAGE}/ tests/
 
 venv: ## Create a python virtual environment
 	python -m venv ${VENV_DIR}
-
-
 
 setup: venv pip-dev pc-install
 
