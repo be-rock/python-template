@@ -1,17 +1,18 @@
 import datetime
 import logging
+import logging.config
 import os
 import time
+import tomllib as toml
 from pathlib import Path
 from typing import Union
 
-import tomllib as toml
 from pydantic import BaseModel, BaseSettings
 
 APP_ENV = os.environ.get("APP_ENV", "dev")  # dev, tst, prd
 DEBUG = bool(os.environ.get("DEBUG", "").lower().startswith("y"))
 LOG_LEVEL = logging.DEBUG if DEBUG else logging.INFO
-LOG_FILE = "app.log"
+LOG_FILE = "/tmp/app.log"
 LOG_FORMAT = "%(asctime)s | %(levelname)s | %(name)s | %(message)s"
 LOG_HOME = os.getenv("LOG_DIR", ".")
 
@@ -20,58 +21,55 @@ class UTCFormatter(logging.Formatter):
     converter = time.gmtime
 
 
-# LOGGING_CONFIG = dict(
-#     version=1,
-#     disable_existing_loggers=True,
-#     formatters={
-#         'standard': {
-#             'format': LOG_FORMAT,
-#             '()': UTCFormatter
-#         },
-#         'jsonformat': {
-#             'format': f'pythonjsonlogger.jsonlogger.JsonFormatter({LOG_FORMAT})'
-#         }
-#     },
-#     handlers={
-#         'default': {
-#             'level': LOG_LEVEL,
-#             'formatter': 'standard',
-#             'class': 'logging.StreamHandler',
-#             'stream': 'ext://sys.stdout',  # Default is stderr
-#         },
-#         'json': {
-#             'level': LOG_LEVEL,
-#             'formatter': 'jsonformat',
-#             'class': 'logging.StreamHandler',
-#             'stream': 'ext://sys.stdout',  # Default is stderr
-#         },
-#         'file_handler': {
-#             'level': LOG_LEVEL,
-#             'formatter': 'standard',
-#             'class': 'logging.handlers.TimedRotatingFileHandler',
-#             'filename': LOG_FILE,
-#             'when': 'm', # minute
-#             'interval': 1,
-#         },
-#     },
-#     loggers={
-#         '': {  # root logger
-#             'handlers': ['default'],
-#             'level': LOG_LEVEL, # only log entries this level and above will be included
-#             'propagate': False
-#         },
-#         '__main__': {  # special logger for __main__ or another module
-#             'handlers': ['default', 'file_handler'],
-#             'level': LOG_LEVEL,
-#             'propagate': False
-#         },
-#         'jsonlogger': {
-#             'handlers': ['json'],
-#             'level': LOG_LEVEL,
-#             'propagate': False
-#         },
-#     }
-# )
+LOGGING_CONFIG = dict(
+    version=1,
+    disable_existing_loggers=True,
+    formatters={
+        "standard": {"format": LOG_FORMAT, "()": UTCFormatter},
+        "jsonformat": {
+            "format": f"pythonjsonlogger.jsonlogger.JsonFormatter({LOG_FORMAT})"
+        },
+    },
+    handlers={
+        "default": {
+            "level": LOG_LEVEL,
+            "formatter": "standard",
+            "class": "logging.StreamHandler",
+            "stream": "ext://sys.stdout",  # Default is stderr
+        },
+        "json": {
+            "level": LOG_LEVEL,
+            "formatter": "jsonformat",
+            "class": "logging.StreamHandler",
+            "stream": "ext://sys.stdout",  # Default is stderr
+        },
+        "file_handler": {
+            "level": LOG_LEVEL,
+            "formatter": "standard",
+            "class": "logging.handlers.TimedRotatingFileHandler",
+            "filename": LOG_FILE,
+            "when": "m",  # minute
+            "interval": 1,
+        },
+    },
+    loggers={
+        "": {  # root logger
+            "handlers": ["default", "file_handler"],
+            "level": LOG_LEVEL,
+            "propagate": False,
+        },
+        "__main__": {  # special logger for __main__
+            "handlers": ["default", "file_handler"],
+            "level": LOG_LEVEL,
+            "propagate": False,
+        },
+        "jsonlogger": {
+            "handlers": ["json"],
+            "level": LOG_LEVEL,
+            "propagate": False,
+        },
+    },
+)
 
 
 def read_toml_config_file(config_file: str) -> dict:
@@ -83,10 +81,7 @@ def read_toml_config_file(config_file: str) -> dict:
 
 
 def get_logger(
-    logger_name: str,
-    logging_config: dict = read_toml_config_file(
-        config_file="logging-conf.toml"
-    ),
+    logger_name: str, logging_config: dict = LOGGING_CONFIG
 ) -> logging.Logger:
     logging.config.dictConfig(logging_config)
     return logging.getLogger(logger_name)
@@ -128,16 +123,16 @@ class Config(BaseSettings):
         allow_mutation = False
 
 
-def set_app_env_vars(env_file: str = ".env") -> None:
-    with open(env_file, "r") as f:
-        data = f.read()
-        for item in data.rstrip("\n").split("\n"):
-            k, v = item.split("=")
-            os.environ[k] = v
+# def set_app_env_vars(env_file: str = ".env") -> None:
+#     with open(env_file, "r") as f:
+#         data = f.read()
+#         for item in data.rstrip("\n").split("\n"):
+#             k, v = item.split("=")
+#             os.environ[k] = v
 
-
-log_conf = read_toml_config_file(config_file="logging-conf.toml")
-logger = get_logger(logger_name=__name__, logging_config=log_conf)
+logger = get_logger(logger_name=__name__, logging_config=LOGGING_CONFIG)
 app_conf = read_toml_config_file(config_file="app-conf.toml")
 CONFIG = Config(**app_conf)
-set_app_env_vars(env_file=".env")
+logger.debug(f"logging config: {LOGGING_CONFIG}")
+logger.debug(f"app config: {CONFIG}")
+# set_app_env_vars(env_file=".env")

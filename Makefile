@@ -52,6 +52,10 @@ pylint: ## pylint
 radon: ## radon
 	${VENV_DIR}/bin/radon cc -a -nc src/${PACKAGE}/ tests/
 
+ruff: ## ruff linting
+	${VENV_DIR}/bin/ruff src/${PACKAGE}/ tests/
+
+
 test: ## Run tests
 	${VENV_DIR}/bin/pytest -s --verbose tests/
 
@@ -61,6 +65,7 @@ typehint: ## Mypy typehints
 venv: ## Create a python virtual environment
 	python -m venv ${VENV_DIR}
 
-setup: venv pip-dev pc-install
+setup:
+	venv pip-dev pc-install
 
 checklist: black autoflake isort pylint

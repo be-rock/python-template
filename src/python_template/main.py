@@ -4,7 +4,7 @@ logger = get_logger(logger_name=__name__)
 
 
 def main() -> None:
-    logger.info("hello")
+    logger.info("hello from main")
 
 
 if __name__ == "__main__":

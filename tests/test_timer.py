@@ -1,7 +1,6 @@
 """
 test for a basic timer decorator
 """
-import json
 from functools import wraps
 from time import perf_counter
 
@@ -22,8 +21,8 @@ def timer_logger(logger):
             logger.info(f"begin {func.__name__}")
             result = func(*args, **kwargs)
             logger.info(
-                f"end {func.__name__}",
-                extra={"elapsed": round((perf_counter() - start).real, 6)},
+                f"end {func.__name__}, elapsed: "
+                f"{round((perf_counter() - start).real, 6)}"
             )
             return result
 
@@ -40,9 +39,9 @@ def test_timer_logger_decorator():
         assert True
 
     func()
+
     contains_elapsed = []
     with open("/tmp/app.log", "r") as f:
         for line in f:
-            data = json.loads(line)
-            contains_elapsed.append("elapsed" in data.keys())
+            contains_elapsed.append("elapsed" in line)
     assert any(contains_elapsed)

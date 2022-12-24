@@ -9,3 +9,4 @@ pre-commit
 pylint
 python-json-logger
 radon
+ruff # https://github.com/charliermarsh/ruff
