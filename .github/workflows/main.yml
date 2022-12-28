@@ -15,6 +15,6 @@ jobs:
           python-version: '3.11'
       - run: |
           make venv
-          make pip-prd
+          make pip-dev
           make ruff
           make test
