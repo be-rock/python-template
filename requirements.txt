@@ -3,4 +3,3 @@ pydantic
 pytest
 pytest-cov
 python-json-logger
-tomli

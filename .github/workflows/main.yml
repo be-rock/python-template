@@ -1,0 +1,18 @@
+name: main
+# env:
+on: [push]
+jobs:
+  setup-environment:
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v3
+        with:
+          python-version: '3.11'
+      - run: |
+          make venv
+          make pip-prd
+          make test
