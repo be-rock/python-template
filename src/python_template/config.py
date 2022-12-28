@@ -10,7 +10,7 @@ from typing import Union
 from pydantic import BaseModel, BaseSettings
 
 APP_ENV = os.environ.get("APP_ENV", "dev")  # dev, tst, prd
-DEBUG = bool(os.environ.get("DEBUG", "").lower().startswith("y"))
+DEBUG = os.environ.get("DEBUG", "").lower() == "true"
 LOG_LEVEL = logging.DEBUG if DEBUG else logging.INFO
 LOG_FILE = "/tmp/app.log"
 LOG_FORMAT = "%(asctime)s | %(levelname)s | %(name)s | %(message)s"

@@ -1,5 +1,6 @@
 name: main
-# env:
+env:
+  DEBUG: true
 on: [push]
 jobs:
   setup-environment:
@@ -15,4 +16,5 @@ jobs:
       - run: |
           make venv
           make pip-prd
+          make ruff
           make test

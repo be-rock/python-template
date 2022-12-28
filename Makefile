@@ -55,7 +55,6 @@ radon: ## radon
 ruff: ## ruff linting
 	${VENV_DIR}/bin/ruff src/${PACKAGE}/ tests/
 
-
 test: ## Run tests
 	${VENV_DIR}/bin/pytest -s --verbose tests/
 
