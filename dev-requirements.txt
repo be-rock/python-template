@@ -1,12 +1,14 @@
 -r requirements.txt # include prod requirements in dev
-autoflake
+# autoflake
 black
 ipython
-isort
 # locust # load testing
 # mkdocs # static site generator
+mypy
 pre-commit
 pylint
-python-json-logger
+# python-json-logger
 radon
 ruff # https://github.com/charliermarsh/ruff
+pytest
+pytest-cov
