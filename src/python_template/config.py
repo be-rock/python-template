@@ -16,6 +16,7 @@ LOG_FILE = "/tmp/app.log"
 LOG_FORMAT = "%(asctime)s | %(levelname)s | %(name)s | %(message)s"
 LOG_HOME = os.getenv("LOG_DIR", ".")
 
+
 # https://docs.python.org/3/howto/logging-cookbook.html#formatting-times-using-utc-gmt-via-configuration
 class UTCFormatter(logging.Formatter):
     converter = time.gmtime

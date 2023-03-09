@@ -6,7 +6,7 @@ ipython
 # mkdocs # static site generator
 mypy
 pre-commit
-pylint
+# pylint
 # python-json-logger
 radon
 ruff # https://github.com/charliermarsh/ruff

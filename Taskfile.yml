@@ -1,0 +1,82 @@
+# https://github.com/go-task/task
+# https://taskfile.dev
+
+version: '3'
+
+env:
+  PACKAGE: python_template
+
+vars:
+  VENV_DIR: "{{.HOME}}/.venv/$PACKAGE"
+
+tasks:
+  # testing1234:
+  #   desc: testing1234
+  #   cmds:
+  #     - echo {{.VENV_DIR}}
+      # - rm -rf "{{.VENV_DIR}}"
+      # - "rm -rf {{.VENV_DIR}}"
+    # silent: false
+  black:
+    desc: run the python black formatter
+    cmds:
+      - "{{.VENV_DIR}}/bin/black src/${PACKAGE}/ tests/"
+  checklist:
+    desc: run python toolkit
+    deps: [black, radon, ruff]
+  clean:
+    desc: cleanup python environment and cache
+    deps: [venv-remove]
+    cmds:
+      - rm -rf dist/
+      - rm -rf build/
+      - rm -rf _build/
+      - rm -rf *.egg-info
+      - find . -name '*.pyc' -delete
+      - find . -name '*.pyo' -delete
+      - find . -name '*.egg-link' -delete
+      - find . -name '__pycache__' -type d -exec rm --recursive --force {} +
+      - find . -name '.mypy_cache' -type d -exec rm --recursive --force {} +
+      - find . -name '.pytest_cache' -type d -exec rm --recursive --force {} +
+      - find . -name '.ruff_cache' -type d -exec rm --recursive --force {} +
+      - find . -name '*.pyc' -exec rm --force {} +
+      - find . -name '*.pyo' -exec rm --force {} +
+  install:
+    desc: pip install
+    cmds:
+      - "{{.VENV_DIR}}/bin/pip install --requirement requirements-dev.txt"
+    silent: false
+  pc-install:
+    desc: pre-commit install
+    cmds:
+      - "{{.VENV_DIR}}/bin/pre-commit install"
+  radon:
+    desc: run radon
+    cmds:
+	    - "{{.VENV_DIR}}/bin/radon cc --average -nc src/$PACKAGE/ tests/"
+	    - "{{.VENV_DIR}}/bin/radon mi src/$PACKAGE/ tests/"
+    silent: false
+  ruff:
+    desc: ruff linter
+    silent: false
+    cmds:
+      - "{{.VENV_DIR}}/bin/ruff --show-files src/$PACKAGE/ tests/"
+  setup:
+    desc: setup dev environment
+    deps: [venv, install, pc-install]
+    silent: false
+  test:
+    desc: run tests with pytest
+    cmds:
+      - "{{.VENV_DIR}}/bin/pytest -s --verbose tests/"
+  venv:
+    desc: create python virtual environment with venv
+    cmds:
+      - "python -m venv {{.VENV_DIR}}"
+      # - {{.VENV_DIR}}/bin/python -m pip install --upgrade pip
+    silent: false
+  venv-remove:
+    desc: remove python virtual environment
+    cmds:
+      - "rm -rf {{.VENV_DIR}}"
+    silent: false
