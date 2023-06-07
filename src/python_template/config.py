@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Union
 
 from pydantic import BaseModel, BaseSettings
+import pythonjsonlogger
 
 APP_ENV = os.environ.get("APP_ENV", "dev")  # dev, tst, prd
 DEBUG = os.environ.get("DEBUG", "").lower() == "true"
@@ -26,9 +27,16 @@ LOGGING_CONFIG = dict(
     version=1,
     disable_existing_loggers=True,
     formatters={
-        "standard": {"format": LOG_FORMAT, "()": UTCFormatter},
+        "standard": {
+            "()": UTCFormatter,
+            "format": LOG_FORMAT,
+        },
         "jsonformat": {
-            "format": f"pythonjsonlogger.jsonlogger.JsonFormatter({LOG_FORMAT})"
+            # "format": pythonjsonlogger.jsonlogger.JsonFormatter({LOG_FORMAT})
+            # "format": pythonjsonlogger.jsonlogger.JsonFormatter
+            "()": "pythonjsonlogger.jsonlogger.JsonFormatter",
+            "format": LOG_FORMAT,
+            "rename_fields": {"asctime": "time", "levelname": "level"},
         },
     },
     handlers={
@@ -41,8 +49,12 @@ LOGGING_CONFIG = dict(
         "json": {
             "level": LOG_LEVEL,
             "formatter": "jsonformat",
-            "class": "logging.StreamHandler",
-            "stream": "ext://sys.stdout",  # Default is stderr
+            "class": "logging.handlers.TimedRotatingFileHandler",
+            "filename": LOG_FILE,
+            "when": "m",  # minute
+            "interval": 1,
+            # "class": "logging.StreamHandler",
+            # "stream": "ext://sys.stdout",  # Default is stderr
         },
         "file_handler": {
             "level": LOG_LEVEL,
@@ -60,7 +72,7 @@ LOGGING_CONFIG = dict(
             "propagate": False,
         },
         "__main__": {  # special logger for __main__
-            "handlers": ["default", "file_handler"],
+            "handlers": ["default", "file_handler", "json"],
             "level": LOG_LEVEL,
             "propagate": False,
         },

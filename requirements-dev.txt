@@ -7,7 +7,7 @@ ipython
 mypy
 pre-commit
 # pylint
-# python-json-logger
+python-json-logger
 radon
 ruff # https://github.com/charliermarsh/ruff
 pytest

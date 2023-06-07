@@ -3,27 +3,30 @@
 
 version: '3'
 
+dotenv: ['.env', '{{.ENV}}/.env.', '{{.HOME}}/.env']
+
 env:
   PACKAGE: python_template
+  DOCKER_IMAGE: ${{.PACKAGE}}kj:version
 
 vars:
   VENV_DIR: "{{.HOME}}/.venv/$PACKAGE"
 
 tasks:
-  # testing1234:
-  #   desc: testing1234
-  #   cmds:
-  #     - echo {{.VENV_DIR}}
-      # - rm -rf "{{.VENV_DIR}}"
-      # - "rm -rf {{.VENV_DIR}}"
-    # silent: false
+
+  dummy:
+    cmds:
+      - echo $DOCKER_IMAGE
+
   black:
     desc: run the python black formatter
     cmds:
-      - "{{.VENV_DIR}}/bin/black src/${PACKAGE}/ tests/"
+      - "{{.VENV_DIR}}/bin/black src/$PACKAGE/ tests/"
+
   checklist:
     desc: run python toolkit
-    deps: [black, radon, ruff]
+    deps: [black, ruff]
+
   clean:
     desc: cleanup python environment and cache
     deps: [venv-remove]
@@ -41,42 +44,61 @@ tasks:
       - find . -name '.ruff_cache' -type d -exec rm --recursive --force {} +
       - find . -name '*.pyc' -exec rm --force {} +
       - find . -name '*.pyo' -exec rm --force {} +
+
+  dbuild:
+    desc: docker build $DOCKER_IMAGE
+    cmds:
+      - docker build . --network host --tag $DOCKER_IMAGE
+    silent: false
+
   install:
+    deps: [venv]
     desc: pip install
     cmds:
-      - "{{.VENV_DIR}}/bin/pip install --requirement requirements-dev.txt"
+      - "{{.VENV_DIR}}/bin/pip install --upgrade pip --requirement requirements-dev.txt"
     silent: false
+
   pc-install:
     desc: pre-commit install
     cmds:
       - "{{.VENV_DIR}}/bin/pre-commit install"
-  radon:
-    desc: run radon
-    cmds:
-	    - "{{.VENV_DIR}}/bin/radon cc --average -nc src/$PACKAGE/ tests/"
-	    - "{{.VENV_DIR}}/bin/radon mi src/$PACKAGE/ tests/"
-    silent: false
+
+        #  radon:
+        #    desc: run radon
+        #    cmds:
+        #      - "{{.VENV_DIR}}/bin/radon cc --average -nc src/$PACKAGE/ tests/"
+        #        #- "{{.VENV_DIR}}/bin/radon mi src/$PACKAGE/ tests/"
+        #   silent: false
+
   ruff:
     desc: ruff linter
     silent: false
     cmds:
       - "{{.VENV_DIR}}/bin/ruff --show-files src/$PACKAGE/ tests/"
+
   setup:
     desc: setup dev environment
-    deps: [venv, install, pc-install]
+    deps: [install]
     silent: false
+    cmds:
+      - task: pc-install
+
   test:
     desc: run tests with pytest
     cmds:
       - "{{.VENV_DIR}}/bin/pytest -s --verbose tests/"
+
   venv:
     desc: create python virtual environment with venv
     cmds:
-      - "python -m venv {{.VENV_DIR}}"
-      # - {{.VENV_DIR}}/bin/python -m pip install --upgrade pip
+      - python -m venv {{.VENV_DIR}}
+      - "{{.VENV_DIR}}/bin/python -m pip install --upgrade pip"
     silent: false
+    status:
+      - test -d {{.VENV_DIR}}
+
   venv-remove:
     desc: remove python virtual environment
     cmds:
-      - "rm -rf {{.VENV_DIR}}"
+      - rm -rf {{.VENV_DIR}}
     silent: false
