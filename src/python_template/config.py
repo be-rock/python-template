@@ -8,7 +8,6 @@ from pathlib import Path
 from typing import Union
 
 from pydantic import BaseModel, BaseSettings
-import pythonjsonlogger
 
 APP_ENV = os.environ.get("APP_ENV", "dev")  # dev, tst, prd
 DEBUG = os.environ.get("DEBUG", "").lower() == "true"

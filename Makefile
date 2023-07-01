@@ -1,7 +1,7 @@
 .DEFAULT_GOAL := help
 PACKAGE := python_template
 OLD_PACKAGE := ${shell find . -maxdepth 2 -name __init__.py | grep -v tests | cut -d'/' -f2}
-VENV_DIR := .venv/${PACKAGE}
+VENV_DIR := .venv
 
 help: ## Show this help message.
 	@echo -e 'Usage: make [target] ...\n'
@@ -9,26 +9,33 @@ help: ## Show this help message.
 	@egrep '^(.+)\:\ ##\ (.+)' ${MAKEFILE_LIST} | column -t -c 2 -s ':#'
 
 .PHONY: black
-black: ## Run the black formatter (options are defined in pyproject.toml)
+black: ## Run the black formatter
 	${VENV_DIR}/bin/black src/${PACKAGE}/ tests/
 
 .PHONY: clean
 clean: ## clean up venv and cache
-	find . -type f -name "*pyc" | xargs rm -rf
-	find . -type d -name __pycache__ | xargs rm -rf
-	find ${VENV_DIR} -type d | xargs rm -rf
+	find . -type d -regextype sed -regex ".*/[build|dist|__pycache__|${VENV_DIR}|\.pytest_cache]" -delete
+	find . -type f -regextype sed -regex ".*/[*.egg-info|*\.pyc|*\.pyo|*\.egg-link]" -delete
 
-.PHONY: install
-install: ## Install pip requirements
+.PHONY: pip-install
+pip-install: ## Install pip requirements
 	${VENV_DIR}/bin/pip install --upgrade pip --requirement requirements.txt
 
+.PHONY: rye-init
+rye-init: ## Initialize rye project with `rye init`
+	rye init --name "${$PACKAGE_NAME/_/-}"
+
 .PHONY: ruff
-ruff: ## ruff linting (options are defined in pyproject.toml)
-	${VENV_DIR}/bin/ruff 
+ruff: ## ruff linting
+	${VENV_DIR}/bin/ruff check src/ --select "A", "B", "E", "F", "I", "N", "W", "PTH" --fix
+
+.PHONY: sync-requirements
+requirements-add: ## `rye add` for each item in the `requirements.txt`
+	cat requirements.txt | while read package; do rye add ${package}; done
 
 .PHONY: test
-test: ## Run tests via pytest (options are defined in pyproject.toml)
-	${VENV_DIR}/bin/pytest
+test: ## Run tests via pytest
+	${VENV_DIR}/bin/pytest --cov --cov-report term-missing --cov-fail-under 95 --verbose
 
 .PHONY: typecheck
 typecheck: ## mypy static type-checking (options are defined in pyproject.toml)
@@ -38,7 +45,7 @@ typecheck: ## mypy static type-checking (options are defined in pyproject.toml)
 venv: ## Create a python virtual environment
 	python -m venv ${VENV_DIR}
 
-setup: venv install
+setup: clean venv install
 
-checklist: black ruff 
+checklist: black ruff
 
