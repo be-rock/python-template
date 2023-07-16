@@ -21,17 +21,17 @@ clean: ## clean up venv and cache
 pip-install: ## Install pip requirements
 	${VENV_DIR}/bin/pip install --upgrade pip --requirement requirements.txt
 
-.PHONY: rye-init
-rye-init: ## Initialize rye project with `rye init`
-	rye init --name "${$PACKAGE_NAME/_/-}"
-
 .PHONY: ruff
 ruff: ## ruff linting
 	${VENV_DIR}/bin/ruff check src/ --select "A", "B", "E", "F", "I", "N", "W", "PTH" --fix
 
-.PHONY: sync-requirements
-requirements-add: ## `rye add` for each item in the `requirements.txt`
+.PHONY: rye-add
+rye-add: ## `rye add` for each item in the `requirements.txt`
 	cat requirements.txt | while read package; do rye add ${package}; done
+
+.PHONY: rye-init
+rye-init: ## Initialize rye project with `rye init`
+	rye init --name "${PACKAGE}"
 
 .PHONY: test
 test: ## Run tests via pytest
