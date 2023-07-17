@@ -6,6 +6,7 @@ dependencies = [
     "pytest-cov",
     "python-json-logger",
     "ruff",
+    "pydantic-settings>=2.0.2",
 ]
 description = "Add a short description here"
 readme = "README.md"
