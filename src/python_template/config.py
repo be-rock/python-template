@@ -7,7 +7,8 @@ import tomllib as toml
 from pathlib import Path
 from typing import Union
 
-from pydantic import BaseModel, BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic import BaseModel, ConfigDict
 
 APP_ENV = os.environ.get("APP_ENV", "dev")  # dev, tst, prd
 DEBUG = os.environ.get("DEBUG", "").lower() == "true"
@@ -126,13 +127,14 @@ class Servers(BaseModel):
 
 
 class Config(BaseSettings):
+    model_config = SettingsConfigDict(frozen=True)
     title: str
     owner: Owner
     database: Database
     servers: Servers
 
-    class Config:
-        allow_mutation = False
+    # class Config:
+        # allow_mutation = False
 
 
 # def set_app_env_vars(env_file: str = ".env") -> None:
