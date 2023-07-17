@@ -2,10 +2,7 @@
 name = "python_template"
 dependencies = [
     "pydantic",
-    "pytest",
-    "pytest-cov",
     "python-json-logger",
-    "ruff",
     "pydantic-settings>=2.0.2",
 ]
 description = "Add a short description here"
@@ -33,3 +30,8 @@ testpaths = ["tests"]
 select = ["A", "B", "E", "F", "I", "N", "W", "PTH"]
 [tool.rye]
 managed = true
+dev-dependencies = [
+    "ruff>=0.0.278",
+    "pytest>=7.4.0",
+    "pytest-cov>=4.1.0",
+]
