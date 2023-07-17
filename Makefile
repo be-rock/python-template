@@ -17,6 +17,10 @@ clean: ## clean up venv and cache
 	find . -type d -regextype sed -regex ".*/[build|dist|__pycache__|${VENV_DIR}|\.pytest_cache]" -delete
 	find . -type f -regextype sed -regex ".*/[*.egg-info|*\.pyc|*\.pyo|*\.egg-link]" -delete
 
+.PHONY: pip-dev
+pip-install: ## Install pip requirements
+	${VENV_DIR}/bin/pip install --upgrade pip --requirement requirements-dev.lock
+
 .PHONY: pip-install
 pip-install: ## Install pip requirements
 	${VENV_DIR}/bin/pip install --upgrade pip --requirement requirements.txt

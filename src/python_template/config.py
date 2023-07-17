@@ -133,9 +133,6 @@ class Config(BaseSettings):
     database: Database
     servers: Servers
 
-    # class Config:
-        # allow_mutation = False
-
 
 # def set_app_env_vars(env_file: str = ".env") -> None:
 #     with open(env_file, "r") as f:
