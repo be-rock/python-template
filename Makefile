@@ -1,6 +1,6 @@
 .DEFAULT_GOAL := help
 PACKAGE := python_template
-OLD_PACKAGE := ${shell find . -maxdepth 2 -name __init__.py | grep -v tests | cut -d'/' -f2}
+TEST_COV_PCT := 100
 VENV_DIR := .venv
 
 help: ## Show this help message.
@@ -35,7 +35,7 @@ rye-init: ## Initialize rye project with `rye init`
 
 .PHONY: test
 test: ## Run tests via pytest
-	${VENV_DIR}/bin/pytest --cov --cov-report term-missing --cov-fail-under 95 --verbose
+	${VENV_DIR}/bin/pytest --cov --cov-report term-missing --cov-fail-under ${TEST_COV_PCT} --verbose
 
 .PHONY: typecheck
 typecheck: ## mypy static type-checking (options are defined in pyproject.toml)
@@ -48,4 +48,3 @@ venv: ## Create a python virtual environment
 setup: clean venv install
 
 checklist: black ruff
-
