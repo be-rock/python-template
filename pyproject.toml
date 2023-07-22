@@ -34,4 +34,6 @@ dev-dependencies = [
     "ruff>=0.0.278",
     "pytest>=7.4.0",
     "pytest-cov>=4.1.0",
+    "black>=23.7.0",
+    "mypy>=1.4.1",
 ]
