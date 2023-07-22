@@ -7,8 +7,8 @@ import tomllib as toml
 from pathlib import Path
 from typing import Union
 
+from pydantic import BaseModel
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from pydantic import BaseModel, ConfigDict
 
 APP_ENV = os.environ.get("APP_ENV", "dev")  # dev, tst, prd
 DEBUG = os.environ.get("DEBUG", "").lower() == "true"
