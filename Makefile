@@ -18,7 +18,7 @@ clean: ## clean up venv and cache
 	find . -type f -regextype sed -regex ".*/[*.egg-info|*\.pyc|*\.pyo|*\.egg-link]" -delete
 
 .PHONY: pip-dev
-pip-install: ## Install pip requirements
+pip-dev: ## Install pip requirements
 	${VENV_DIR}/bin/pip install --upgrade pip --requirement requirements-dev.lock
 
 .PHONY: pip-install
@@ -27,7 +27,8 @@ pip-install: ## Install pip requirements
 
 .PHONY: ruff
 ruff: ## ruff linting
-	${VENV_DIR}/bin/ruff check src/ --select "A", "B", "E", "F", "I", "N", "W", "PTH" --fix
+	${VENV_DIR}/bin/ruff check src/ --select A,B,E,F,I,N,W,PTH --fix
+	#${VENV_DIR}/bin/ruff check src/ --select "A", "B", "E", "F", "I", "N", "W", "PTH" --fix
 
 .PHONY: rye-add
 rye-add: ## `rye add` for each item in the `requirements.txt`
