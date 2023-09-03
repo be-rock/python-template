@@ -1,5 +1,6 @@
 .DEFAULT_GOAL := help
 PACKAGE := python_template
+PYTHON_VERSION = 3.11.5
 TEST_COV_PCT := 100
 VENV_DIR := .venv
 
@@ -24,8 +25,8 @@ clean: ## clean up venv and cache
 	find . -type d -regextype sed -regex ".*/[build|dist|__pycache__|${VENV_DIR}|\.pytest_cache]" -delete
 	find . -type f -regextype sed -regex ".*/[*.egg-info|*\.pyc|*\.pyo|*\.egg-link]" -delete
 
-.PHONY: pip-dev
-pip-dev: ## Install pip requirements (dev)
+.PHONY: pip-install-dev
+pip-install-dev: ## Install pip requirements (dev)
 	@echo "\nINFO Install pip requirements (dev)..."
 	${VENV_DIR}/bin/pip install --upgrade pip --requirement requirements-dev.lock
 
@@ -40,10 +41,11 @@ ruff: ## Run the ruff linter
 	${VENV_DIR}/bin/ruff check src/ --select A,B,E,F,I,N,W,PTH --fix
 
 .PHONY: rye-init
-rye-init: ## Initialize rye project with `rye init`
-	@echo "\nINFO Initialize rye project with 'rye init' and packages in 'requirements.txt'..."
-	rye init --dev-requirements requirements-dev.txt --name "${PACKAGE}"
-	@echo "\nINFO 'rye sync' the package list"
+rye-init: ## Initialize rye project dev env with `rye init`
+	@echo "\nINFO Initialize rye project with 'rye init' and packages in 'requirements-dev.txt'..."
+	rye init --py ${PYTHON_VERSION} --dev-requirements requirements-dev.txt --name "${PACKAGE}"
+	@echo "\nINFO 'rye sync' the package list..."
+	rye sync
 
 setup: ## Setup the environment
 setup: clean rye-init
@@ -54,13 +56,12 @@ test: ## Run tests via pytest
 	${VENV_DIR}/bin/pytest --cov --cov-report term-missing --cov-fail-under ${TEST_COV_PCT} --verbose
 
 .PHONY: typecheck
-typecheck: ## mypy static type-checking 
+typecheck: ## mypy static type-checking
 	@echo "\nINFO mypy static type-checking..."
 	${VENV_DIR}/bin/mypy --ignore-missing-imports --explicit-package-bases src/${PACKAGE}/ tests/
 
 .PHONY: venv
 venv: ## Create a python virtual environment
 	@echo "\nINFO Create a python virtual environment..."
-	${VENV_DIR}/bin/mypy --ignore-missing-imports --explicit-package-bases src/${PACKAGE}/ tests/
 	python -m venv ${VENV_DIR}
 
